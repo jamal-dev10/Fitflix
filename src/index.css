@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --fit-yellow: #FFFF00;
+    --fit-yellow-hover: #E6E600;
+    --fit-dark: #0A0A0A;
+    --fit-gray: #999999;
+  }
+
+  body {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Custom interactive effects from original FitFlex */
+.card-zoom-img {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .card-zoom-img {
+  transform: scale(1.1);
+}
+
+/* Yellow accent line on card hover */
+.yellow-indicator {
+  transition: width 0.3s ease;
+  width: 0;
+}
+
+.group:hover .yellow-indicator {
+  width: 140px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FFFF00;
+}

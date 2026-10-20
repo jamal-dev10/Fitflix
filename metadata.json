@@ -1,0 +1,8 @@
+{
+  "name": "FitFlex Gym & Fitness",
+  "description": "High-performance fitness, personal training, workout programs, and tailored nutrition coaching web application.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
