@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { QrCode, Calendar, Clock, User, Shield, CheckCircle2, Trash2, Dumbbell, Timer, ArrowRight, LogOut, Flame } from 'lucide-react';
+import { QrCode, Calendar, Clock, User, Shield, CheckCircle2, Trash2, Dumbbell, Timer, ArrowRight, LogOut, Flame, Target } from 'lucide-react';
+import { ProgressTracker } from '../components/ProgressTracker';
+import { FitnessGoalsSection } from '../components/FitnessGoalsSection';
 
 interface Reservation {
   id: string;
@@ -210,6 +212,12 @@ export const DashboardPage: React.FC<{ onOpenTimer: () => void }> = ({ onOpenTim
             </div>
           </div>
         </div>
+
+        {/* Specific Fitness Goals with Attainment Progress Bars */}
+        <FitnessGoalsSection token={token} />
+
+        {/* Visual Biometric Progress Tracker (Recharts) */}
+        <ProgressTracker token={token} targetWeight={80} />
 
         {/* 2-Column Split: Active Reservations vs Consultations */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

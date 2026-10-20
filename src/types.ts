@@ -109,3 +109,29 @@ export interface FaqItem {
   answer: string;
   category: 'membership' | 'training' | 'nutrition' | 'facility';
 }
+
+export interface ProgressLog {
+  id: string;
+  date: string;
+  weight: number;
+  bodyFat?: number;
+  chest?: number;
+  waist?: number;
+  arms?: number;
+  thighs?: number;
+  notes?: string;
+}
+
+export interface FitnessGoalItem {
+  id: string;
+  title: string;
+  category: 'weight_loss' | 'weight_gain' | 'muscle_gain' | 'workout_frequency' | 'nutrition';
+  currentValue: number;
+  targetValue: number;
+  startValue: number;
+  unit: string;
+  deadline?: string;
+  notes?: string;
+}
+
+

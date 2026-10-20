@@ -63,6 +63,36 @@ interface ContactMessage {
   createdAt: string;
 }
 
+interface ServerProgressLog {
+  id: string;
+  userEmail: string;
+  date: string;
+  weight: number;
+  bodyFat?: number;
+  chest?: number;
+  waist?: number;
+  arms?: number;
+  thighs?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+interface ServerFitnessGoal {
+  id: string;
+  userEmail: string;
+  title: string;
+  category: 'weight_loss' | 'weight_gain' | 'muscle_gain' | 'workout_frequency' | 'nutrition';
+  currentValue: number;
+  targetValue: number;
+  startValue: number;
+  unit: string;
+  deadline?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+
+
 const users: User[] = [
   {
     id: 'u1',
@@ -130,6 +160,144 @@ const consultations: Consultation[] = [
 ];
 
 const contactMessages: ContactMessage[] = [];
+
+const progressLogs: ServerProgressLog[] = [
+  {
+    id: 'prog-1',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-08-15',
+    weight: 86.4,
+    bodyFat: 21.8,
+    chest: 104,
+    waist: 92.5,
+    arms: 37.0,
+    thighs: 60.5,
+    notes: 'Initial FitFlex baseline weigh-in with Coach Marcus.',
+    createdAt: new Date('2026-08-15').toISOString(),
+  },
+  {
+    id: 'prog-2',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-08-29',
+    weight: 85.1,
+    bodyFat: 20.6,
+    chest: 104.5,
+    waist: 90.0,
+    arms: 37.2,
+    thighs: 60.0,
+    notes: 'Week 2 check-in. Sore after Romanian deadlifts but recovery is on point.',
+    createdAt: new Date('2026-08-29').toISOString(),
+  },
+  {
+    id: 'prog-3',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-09-12',
+    weight: 84.0,
+    bodyFat: 19.4,
+    chest: 105.0,
+    waist: 88.0,
+    arms: 37.5,
+    thighs: 59.5,
+    notes: 'Increased daily water to 3.5L. Energy levels feeling sharp.',
+    createdAt: new Date('2026-09-12').toISOString(),
+  },
+  {
+    id: 'prog-4',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-09-26',
+    weight: 83.2,
+    bodyFat: 18.2,
+    chest: 105.5,
+    waist: 86.5,
+    arms: 38.0,
+    thighs: 59.0,
+    notes: 'Broke 100kg bench press milestone! Waist dropped 6cm since start.',
+    createdAt: new Date('2026-09-26').toISOString(),
+  },
+  {
+    id: 'prog-5',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-10',
+    weight: 82.0,
+    bodyFat: 17.0,
+    chest: 106.0,
+    waist: 85.0,
+    arms: 38.4,
+    thighs: 59.0,
+    notes: 'Added Friday night HIIT sprint session. Conditioning elevated.',
+    createdAt: new Date('2026-10-10').toISOString(),
+  },
+  {
+    id: 'prog-6',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-20',
+    weight: 81.2,
+    bodyFat: 16.1,
+    chest: 106.5,
+    waist: 83.5,
+    arms: 38.8,
+    thighs: 58.5,
+    notes: 'Current weigh-in. Down 5.2kg with visible abdominal definition.',
+    createdAt: new Date('2026-10-20').toISOString(),
+  },
+];
+
+const fitnessGoals: ServerFitnessGoal[] = [
+  {
+    id: 'goal-1',
+    userEmail: 'demo@fitflex.com',
+    title: 'Target Body Recomposition & Fat Shred',
+    category: 'weight_loss',
+    startValue: 86.4,
+    currentValue: 81.2,
+    targetValue: 78.0,
+    unit: 'kg',
+    deadline: '2026-12-15',
+    notes: 'Aiming for sub-15% body fat with visible abs.',
+    createdAt: new Date('2026-08-15').toISOString(),
+  },
+  {
+    id: 'goal-2',
+    userEmail: 'demo@fitflex.com',
+    title: 'Lean Muscle Mass Hypertrophy',
+    category: 'muscle_gain',
+    startValue: 64.0,
+    currentValue: 67.2,
+    targetValue: 70.0,
+    unit: 'kg',
+    deadline: '2027-02-01',
+    notes: 'Progressive overload on barbell squats and deadlifts.',
+    createdAt: new Date('2026-08-15').toISOString(),
+  },
+  {
+    id: 'goal-3',
+    userEmail: 'demo@fitflex.com',
+    title: 'Weekly Gym Training Consistency',
+    category: 'workout_frequency',
+    startValue: 2,
+    currentValue: 4,
+    targetValue: 5,
+    unit: 'days/week',
+    deadline: '2026-11-30',
+    notes: '4 lifting sessions + 1 high-tempo HIIT class weekly.',
+    createdAt: new Date('2026-09-01').toISOString(),
+  },
+  {
+    id: 'goal-4',
+    userEmail: 'demo@fitflex.com',
+    title: 'Daily High-Protein Target',
+    category: 'nutrition',
+    startValue: 120,
+    currentValue: 165,
+    targetValue: 180,
+    unit: 'g/day',
+    deadline: '2026-12-31',
+    notes: 'Hitting 2.2g protein per kg of bodyweight.',
+    createdAt: new Date('2026-09-10').toISOString(),
+  },
+];
+
+
 
 // Helper to extract bearer token / email
 function getAuthEmail(req: Request): string | null {
@@ -410,6 +578,122 @@ app.post('/api/membership/enroll', (req: Request, res: Response) => {
     memberId: user ? user.memberId : `FF-${Math.floor(100000 + Math.random() * 900000)}`,
     token,
   });
+});
+
+// Progress Tracking: List logs
+app.get('/api/progress', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || 'demo@fitflex.com';
+  const userLogs = progressLogs
+    .filter((p) => p.userEmail.toLowerCase() === email.toLowerCase())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  return res.json({ logs: userLogs });
+});
+
+// Progress Tracking: Log new measurement
+app.post('/api/progress', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || req.body.email || 'demo@fitflex.com';
+  const { date, weight, bodyFat, chest, waist, arms, thighs, notes } = req.body;
+
+  if (!weight) {
+    return res.status(400).json({ error: 'Body weight is required.' });
+  }
+
+  const newLog: ServerProgressLog = {
+    id: `prog-${Date.now()}`,
+    userEmail: email.toLowerCase(),
+    date: date || new Date().toISOString().split('T')[0],
+    weight: Number(weight),
+    bodyFat: bodyFat ? Number(bodyFat) : undefined,
+    chest: chest ? Number(chest) : undefined,
+    waist: waist ? Number(waist) : undefined,
+    arms: arms ? Number(arms) : undefined,
+    thighs: thighs ? Number(thighs) : undefined,
+    notes: notes || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  progressLogs.push(newLog);
+  return res.status(201).json({ message: 'Measurement logged successfully', log: newLog });
+});
+
+// Progress Tracking: Delete log
+app.delete('/api/progress/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const index = progressLogs.findIndex((p) => p.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Log entry not found.' });
+  }
+
+  const removed = progressLogs.splice(index, 1);
+  return res.json({ message: 'Log deleted', removed: removed[0] });
+});
+
+// Fitness Goals: List
+app.get('/api/goals', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || 'demo@fitflex.com';
+  const userGoals = fitnessGoals.filter(
+    (g) => g.userEmail.toLowerCase() === email.toLowerCase()
+  );
+  return res.json({ goals: userGoals });
+});
+
+// Fitness Goals: Create
+app.post('/api/goals', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || req.body.email || 'demo@fitflex.com';
+  const { title, category, startValue, currentValue, targetValue, unit, deadline, notes } = req.body;
+
+  if (!title || targetValue === undefined) {
+    return res.status(400).json({ error: 'Goal title and target value are required.' });
+  }
+
+  const newGoal: ServerFitnessGoal = {
+    id: `goal-${Date.now()}`,
+    userEmail: email.toLowerCase(),
+    title,
+    category: category || 'weight_loss',
+    startValue: Number(startValue ?? currentValue ?? 0),
+    currentValue: Number(currentValue ?? startValue ?? 0),
+    targetValue: Number(targetValue),
+    unit: unit || 'kg',
+    deadline: deadline || '',
+    notes: notes || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  fitnessGoals.push(newGoal);
+  return res.status(201).json({ message: 'Goal created successfully', goal: newGoal });
+});
+
+// Fitness Goals: Update progress
+app.put('/api/goals/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const goal = fitnessGoals.find((g) => g.id === id);
+  if (!goal) {
+    return res.status(404).json({ error: 'Goal not found.' });
+  }
+
+  const { title, currentValue, targetValue, startValue, unit, deadline, notes } = req.body;
+  if (title !== undefined) goal.title = title;
+  if (currentValue !== undefined) goal.currentValue = Number(currentValue);
+  if (targetValue !== undefined) goal.targetValue = Number(targetValue);
+  if (startValue !== undefined) goal.startValue = Number(startValue);
+  if (unit !== undefined) goal.unit = unit;
+  if (deadline !== undefined) goal.deadline = deadline;
+  if (notes !== undefined) goal.notes = notes;
+
+  return res.json({ message: 'Goal updated successfully', goal });
+});
+
+// Fitness Goals: Delete
+app.delete('/api/goals/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const index = fitnessGoals.findIndex((g) => g.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Goal not found.' });
+  }
+
+  const removed = fitnessGoals.splice(index, 1);
+  return res.json({ message: 'Goal deleted successfully', removed: removed[0] });
 });
 
 // Gym Live Overview Stats
