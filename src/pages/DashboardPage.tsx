@@ -7,6 +7,7 @@ import { FitnessGoalsSection } from '../components/FitnessGoalsSection';
 import { WorkoutCalendar } from '../components/WorkoutCalendar';
 import { WeeklyVolumeChart } from '../components/WeeklyVolumeChart';
 import { WeeklySummaryEmailModal } from '../components/WeeklySummaryEmailModal';
+import { ActivityLogs } from '../components/ActivityLogs';
 
 interface Reservation {
   id: string;
@@ -235,6 +236,13 @@ export const DashboardPage: React.FC<{ onOpenTimer: () => void }> = ({ onOpenTim
 
         {/* Weekly Workout Volume & Duration Bar Chart (Recharts) */}
         <WeeklyVolumeChart token={token} />
+
+        {/* Firestore Activity Logs & Workout History */}
+        <ActivityLogs
+          token={token}
+          userEmail={user.email}
+          userId={user.id}
+        />
 
         {/* Visual Interactive Workout Calendar */}
         <WorkoutCalendar token={token} />

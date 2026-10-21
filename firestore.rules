@@ -31,7 +31,7 @@ service cloud.firestore {
              data.userId is string && data.userId == request.auth.uid &&
              data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
              data.date is string && data.date.size() <= 10 &&
-             data.type in ['strength', 'hiit', 'cardio', 'mobility', 'endurance', 'powerlifting', 'boxing', 'recovery'] &&
+             data.type in ['strength', 'hiit', 'cardio', 'mobility', 'endurance', 'powerlifting', 'boxing', 'recovery', 'yoga', 'other'] &&
              data.duration is number && data.duration > 0 && data.duration <= 1440 &&
              (!('calories' in data) || (data.calories is number && data.calories >= 0 && data.calories <= 10000)) &&
              (!('rpe' in data) || (data.rpe is number && data.rpe >= 1 && data.rpe <= 10)) &&

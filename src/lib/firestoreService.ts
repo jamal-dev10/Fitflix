@@ -135,6 +135,30 @@ export async function getFirestoreWorkouts(userId: string): Promise<FirestoreWor
   }
 }
 
+export function subscribeFirestoreWorkouts(
+  userId: string,
+  onWorkoutsChange: (workouts: FirestoreWorkout[]) => void,
+  onErrorHandler?: (err: Error) => void
+): () => void {
+  const path = 'workouts';
+  const q = query(
+    collection(db, path),
+    where('userId', '==', userId)
+  );
+
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const list = snapshot.docs.map((d) => d.data() as FirestoreWorkout);
+      onWorkoutsChange(list);
+    },
+    (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
+      if (onErrorHandler) onErrorHandler(error instanceof Error ? error : new Error(String(error)));
+    }
+  );
+}
+
 export async function saveFirestoreWorkout(workout: FirestoreWorkout): Promise<void> {
   const path = `workouts/${workout.id}`;
   try {

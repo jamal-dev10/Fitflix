@@ -27,7 +27,7 @@
         "userId": { "type": "string", "description": "UID of the member who logged this workout", "pattern": "^[a-zA-Z0-9_\\-]+$" },
         "userEmail": { "type": "string", "description": "Email of the member", "maxLength": 120 },
         "date": { "type": "string", "description": "Date of workout in YYYY-MM-DD", "maxLength": 10 },
-        "type": { "type": "string", "description": "Discipline category", "enum": ["strength", "hiit", "cardio", "mobility", "endurance", "powerlifting", "boxing", "recovery"] },
+        "type": { "type": "string", "description": "Discipline category", "enum": ["strength", "hiit", "cardio", "mobility", "endurance", "powerlifting", "boxing", "recovery", "yoga", "other"] },
         "title": { "type": "string", "description": "Workout name or focus area", "maxLength": 100 },
         "duration": { "type": "number", "description": "Training duration in minutes" },
         "calories": { "type": "number", "description": "Estimated calories burned" },
