@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PersonalTrainingSection } from '../components/PersonalTrainingSection';
 import { BookingModal } from '../components/BookingModal';
 import { Trainer } from '../types';
-import { UserCheck, Shield, Clock, Video, Dumbbell } from 'lucide-react';
+import { UserCheck, Shield, Clock, Video, Dumbbell, ArrowRight } from 'lucide-react';
 
 export const TrainingPage: React.FC = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -29,6 +30,30 @@ export const TrainingPage: React.FC = () => {
             Personalized instruction designed to make you stronger from the inside out. Choose between
             in-gym 1-on-1 private lifting sessions and live remote virtual coaching.
           </p>
+
+          {/* FitFlex Mark Coach Availability Banner */}
+          <div className="mt-8 p-4 sm:p-5 bg-neutral-900 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 p-1.5 bg-neutral-950 border border-[#FFFF00]/40 flex items-center justify-center shrink-0">
+                <img src="/assets/img/mark.png" alt="FitFlex Mark" className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#FFFF00] block">
+                  The FitFlex Mark • Master Roster
+                </span>
+                <p className="text-xs text-white font-bold">
+                  View Live Coach Availability, Shift Slots & Book 1-on-1 Sessions
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/coaches"
+              className="px-4 py-2 bg-[#FFFF00] hover:bg-yellow-400 text-black text-xs font-extrabold uppercase tracking-wider transition-colors inline-flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <span>Coach Availability Deck</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
 

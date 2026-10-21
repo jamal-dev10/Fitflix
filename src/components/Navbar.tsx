@@ -32,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenTimer, onOp
   const navLinks = [
     { name: 'Programs', path: '/programs' },
     { name: 'Training', path: '/training' },
+    { name: 'Coaches', path: '/coaches' },
     { name: 'Nutrition', path: '/nutrition' },
     { name: 'Schedule', path: '/schedule' },
     { name: 'Pricing', path: '/pricing' },

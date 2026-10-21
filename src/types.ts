@@ -134,4 +134,37 @@ export interface FitnessGoalItem {
   notes?: string;
 }
 
+export interface WorkoutSession {
+  id: string;
+  userEmail?: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  discipline: 'strength' | 'cardio' | 'hiit' | 'yoga' | 'recovery' | 'other';
+  durationMinutes: number;
+  exercisesCompleted?: string[];
+  intensityRpe: number; // 1-10
+  caloriesBurned?: number;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface CoachAvailability {
+  id: string;
+  trainerId: string;
+  trainerName: string;
+  avatar: string;
+  role: string;
+  certifications: string[];
+  bio: string;
+  rating: number;
+  reviewsCount: number;
+  sessionsCompleted: number;
+  availableDays: string[];
+  timeSlots: string[];
+  location: string;
+  pricePerSession: number;
+  status: 'available' | 'booked_today' | 'limited';
+}
+
+
 

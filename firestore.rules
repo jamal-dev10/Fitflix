@@ -1,0 +1,151 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity Validation: UserProfile
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.email is string && data.email.size() > 0 && data.email.size() <= 120 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 80 &&
+             data.memberId is string && data.memberId.size() <= 30 &&
+             data.membershipPlan is string && data.membershipPlan.size() <= 50 &&
+             data.role in ['member', 'coach', 'admin'];
+    }
+
+    // Entity Validation: WorkoutSession
+    function isValidWorkout(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
+             data.date is string && data.date.size() <= 10 &&
+             data.type in ['strength', 'hiit', 'cardio', 'mobility', 'endurance', 'powerlifting', 'boxing', 'recovery'] &&
+             data.duration is number && data.duration > 0 && data.duration <= 1440 &&
+             (!('calories' in data) || (data.calories is number && data.calories >= 0 && data.calories <= 10000)) &&
+             (!('rpe' in data) || (data.rpe is number && data.rpe >= 1 && data.rpe <= 10)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000));
+    }
+
+    // Entity Validation: FitnessGoal
+    function isValidFitnessGoal(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 120 &&
+             data.category in ['weight_loss', 'workout_frequency', 'muscle_gain', 'nutrition', 'strength', 'endurance'] &&
+             data.currentValue is number &&
+             data.targetValue is number &&
+             data.unit is string && data.unit.size() <= 20 &&
+             data.status in ['active', 'completed', 'abandoned'];
+    }
+
+    // Entity Validation: ClassReservation
+    function isValidReservation(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.classId is string && data.classId.size() <= 50 &&
+             data.classTitle is string && data.classTitle.size() <= 100 &&
+             data.day is string && data.day.size() <= 20 &&
+             data.time is string && data.time.size() <= 30 &&
+             data.trainer is string && data.trainer.size() <= 80 &&
+             data.status in ['confirmed', 'cancelled'];
+    }
+
+    // Entity Validation: CoachConsultation
+    function isValidConsultation(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.userEmail is string && data.userEmail.size() <= 120 &&
+             data.name is string && data.name.size() <= 80 &&
+             data.trainerName is string && data.trainerName.size() <= 80 &&
+             data.date is string && data.date.size() <= 10 &&
+             data.timeSlot is string && data.timeSlot.size() <= 30 &&
+             data.referenceCode is string && data.referenceCode.size() <= 30 &&
+             data.status in ['scheduled', 'completed', 'cancelled'];
+    }
+
+    // Entity Validation: EmailNotificationRecord
+    function isValidNotification(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.recipientEmail is string && data.recipientEmail.size() <= 120 &&
+             data.subject is string && data.subject.size() <= 200 &&
+             data.sentAt is string && data.sentAt.size() <= 40 &&
+             data.status in ['delivered', 'queued', 'failed'];
+    }
+
+    // Rules for User Profiles (Strict PII isolation)
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false; // Blanket user listing forbidden for PII privacy
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(request.resource.data);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(request.resource.data) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'membershipPlan', 'membershipExpiry', 'fitnessGoal', 'targetCalories', 'role']);
+      allow delete: if false;
+    }
+
+    // Rules for Workouts
+    match /workouts/{workoutId} {
+      allow get: if isSignedIn() && isValidId(workoutId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(workoutId) && isValidWorkout(request.resource.data);
+      allow update: if isSignedIn() && isValidId(workoutId) && resource.data.userId == request.auth.uid &&
+                    isValidWorkout(request.resource.data) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'date', 'type', 'duration', 'calories', 'rpe', 'notes']);
+      allow delete: if isSignedIn() && isValidId(workoutId) && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Goals
+    match /goals/{goalId} {
+      allow get: if isSignedIn() && isValidId(goalId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(goalId) && isValidFitnessGoal(request.resource.data);
+      allow update: if isSignedIn() && isValidId(goalId) && resource.data.userId == request.auth.uid &&
+                    isValidFitnessGoal(request.resource.data) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'category', 'currentValue', 'targetValue', 'unit', 'deadline', 'status']);
+      allow delete: if isSignedIn() && isValidId(goalId) && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Class Reservations
+    match /reservations/{reservationId} {
+      allow get: if isSignedIn() && isValidId(reservationId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(reservationId) && isValidReservation(request.resource.data);
+      allow update: if isSignedIn() && isValidId(reservationId) && resource.data.userId == request.auth.uid &&
+                    isValidReservation(request.resource.data) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      allow delete: if isSignedIn() && isValidId(reservationId) && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Coach Consultations
+    match /consultations/{consultationId} {
+      allow get: if isSignedIn() && isValidId(consultationId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(consultationId) && isValidConsultation(request.resource.data);
+      allow update: if isSignedIn() && isValidId(consultationId) && resource.data.userId == request.auth.uid &&
+                    isValidConsultation(request.resource.data) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'timeSlot', 'date']);
+      allow delete: if isSignedIn() && isValidId(consultationId) && resource.data.userId == request.auth.uid;
+    }
+
+    // Rules for Email Notification History
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn() && isValidId(notificationId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(notificationId) && isValidNotification(request.resource.data);
+      allow update: if false; // Notifications ledger is append-only
+      allow delete: if isSignedIn() && isValidId(notificationId) && resource.data.userId == request.auth.uid;
+    }
+  }
+}

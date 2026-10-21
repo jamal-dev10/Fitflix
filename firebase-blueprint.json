@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered FitFlex gym member or staff user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID of the member", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "description": "Member email address", "maxLength": 120 },
+        "name": { "type": "string", "description": "Member full name", "maxLength": 80 },
+        "memberId": { "type": "string", "description": "Gym credential membership ID", "maxLength": 30 },
+        "membershipPlan": { "type": "string", "description": "Current membership tier name", "maxLength": 50 },
+        "membershipExpiry": { "type": "string", "description": "Membership pass expiry date", "maxLength": 20 },
+        "fitnessGoal": { "type": "string", "description": "Primary fitness objective", "maxLength": 100 },
+        "targetCalories": { "type": "number", "description": "Daily caloric target in kcal" },
+        "role": { "type": "string", "description": "System role", "enum": ["member", "coach", "admin"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp of account creation", "maxLength": 40 }
+      },
+      "required": ["uid", "email", "name", "memberId", "membershipPlan", "role"]
+    },
+    "WorkoutSession": {
+      "title": "WorkoutSession",
+      "description": "Individual logged training session or workout activity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique workout session ID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "description": "UID of the member who logged this workout", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "description": "Email of the member", "maxLength": 120 },
+        "date": { "type": "string", "description": "Date of workout in YYYY-MM-DD", "maxLength": 10 },
+        "type": { "type": "string", "description": "Discipline category", "enum": ["strength", "hiit", "cardio", "mobility", "endurance", "powerlifting", "boxing", "recovery"] },
+        "title": { "type": "string", "description": "Workout name or focus area", "maxLength": 100 },
+        "duration": { "type": "number", "description": "Training duration in minutes" },
+        "calories": { "type": "number", "description": "Estimated calories burned" },
+        "rpe": { "type": "number", "description": "Rate of Perceived Exertion (1-10)" },
+        "notes": { "type": "string", "description": "Post-workout reflections or lifting notes", "maxLength": 2000 },
+        "createdAt": { "type": "string", "description": "ISO timestamp of log entry", "maxLength": 40 }
+      },
+      "required": ["id", "userId", "date", "type", "title", "duration"]
+    },
+    "FitnessGoal": {
+      "title": "FitnessGoal",
+      "description": "User-defined quantitative fitness target and tracking progress",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique goal ID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "description": "UID of the member", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "description": "Email of the member", "maxLength": 120 },
+        "title": { "type": "string", "description": "Goal headline", "maxLength": 120 },
+        "category": { "type": "string", "description": "Goal category", "enum": ["weight_loss", "workout_frequency", "muscle_gain", "nutrition", "strength", "endurance"] },
+        "currentValue": { "type": "number", "description": "Current metric value" },
+        "targetValue": { "type": "number", "description": "Target metric value" },
+        "unit": { "type": "string", "description": "Measurement unit", "maxLength": 20 },
+        "deadline": { "type": "string", "description": "Target completion date", "maxLength": 20 },
+        "status": { "type": "string", "description": "Current goal status", "enum": ["active", "completed", "abandoned"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp", "maxLength": 40 }
+      },
+      "required": ["id", "userId", "title", "category", "currentValue", "targetValue", "unit", "status"]
+    },
+    "ClassReservation": {
+      "title": "ClassReservation",
+      "description": "Group fitness class reservation booked by a member",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Reservation ID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "description": "UID of the member", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "description": "Email of the member", "maxLength": 120 },
+        "classId": { "type": "string", "description": "Identifier of the class scheduled", "maxLength": 50 },
+        "classTitle": { "type": "string", "description": "Name of the group class", "maxLength": 100 },
+        "day": { "type": "string", "description": "Day of the week", "maxLength": 20 },
+        "time": { "type": "string", "description": "Scheduled time window", "maxLength": 30 },
+        "trainer": { "type": "string", "description": "Assigned trainer or coach", "maxLength": 80 },
+        "status": { "type": "string", "description": "Reservation status", "enum": ["confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp", "maxLength": 40 }
+      },
+      "required": ["id", "userId", "classId", "classTitle", "day", "time", "trainer", "status"]
+    },
+    "CoachConsultation": {
+      "title": "CoachConsultation",
+      "description": "Personal training or nutrition consultation booked with a coach",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Consultation ID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "description": "UID of the booking user", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "description": "Contact email of attendee", "maxLength": 120 },
+        "name": { "type": "string", "description": "Full name of attendee", "maxLength": 80 },
+        "trainerName": { "type": "string", "description": "FitFlex coach selected", "maxLength": 80 },
+        "programInterest": { "type": "string", "description": "Specialty or training domain", "maxLength": 100 },
+        "date": { "type": "string", "description": "Consultation date YYYY-MM-DD", "maxLength": 10 },
+        "timeSlot": { "type": "string", "description": "Booked appointment time", "maxLength": 30 },
+        "referenceCode": { "type": "string", "description": "Booking reference confirmation code", "maxLength": 30 },
+        "status": { "type": "string", "description": "Booking status", "enum": ["scheduled", "completed", "cancelled"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp", "maxLength": 40 }
+      },
+      "required": ["id", "userId", "userEmail", "name", "trainerName", "date", "timeSlot", "referenceCode", "status"]
+    },
+    "EmailNotificationRecord": {
+      "title": "EmailNotificationRecord",
+      "description": "Audit record of an automated weekly summary digest dispatched to member",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification dispatch ID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "description": "Target member UID", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "description": "Target member email", "maxLength": 120 },
+        "recipientEmail": { "type": "string", "description": "Recipient address", "maxLength": 120 },
+        "recipientName": { "type": "string", "description": "Recipient name", "maxLength": 80 },
+        "subject": { "type": "string", "description": "Email subject header", "maxLength": 200 },
+        "sentAt": { "type": "string", "description": "ISO timestamp of dispatch", "maxLength": 40 },
+        "goalsCount": { "type": "number", "description": "Count of goals included in digest" },
+        "status": { "type": "string", "description": "Delivery status", "enum": ["delivered", "queued", "failed"] }
+      },
+      "required": ["id", "userId", "recipientEmail", "subject", "sentAt", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with credential details and tier settings"
+    },
+    "/workouts/{workoutId}": {
+      "schema": "WorkoutSession",
+      "description": "Workout sessions logged by members"
+    },
+    "/goals/{goalId}": {
+      "schema": "FitnessGoal",
+      "description": "Quantitative member goals and target metrics"
+    },
+    "/reservations/{reservationId}": {
+      "schema": "ClassReservation",
+      "description": "Reserved group fitness classes"
+    },
+    "/consultations/{consultationId}": {
+      "schema": "CoachConsultation",
+      "description": "Personal training and consultation bookings"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "EmailNotificationRecord",
+      "description": "Weekly summary digest notification dispatch ledger"
+    }
+  }
+}

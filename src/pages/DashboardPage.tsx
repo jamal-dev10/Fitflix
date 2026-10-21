@@ -4,6 +4,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { QrCode, Calendar, Clock, User, Shield, CheckCircle2, Trash2, Dumbbell, Timer, ArrowRight, LogOut, Flame, Target } from 'lucide-react';
 import { ProgressTracker } from '../components/ProgressTracker';
 import { FitnessGoalsSection } from '../components/FitnessGoalsSection';
+import { WorkoutCalendar } from '../components/WorkoutCalendar';
+import { WeeklyVolumeChart } from '../components/WeeklyVolumeChart';
+import { WeeklySummaryEmailModal } from '../components/WeeklySummaryEmailModal';
 
 interface Reservation {
   id: string;
@@ -104,9 +107,16 @@ export const DashboardPage: React.FC<{ onOpenTimer: () => void }> = ({ onOpenTim
             <h1 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
               Welcome Back, {user.name}
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-              Member ID: <span className="font-mono text-white font-bold">{user.memberId}</span> · {user.membershipPlan}
-            </p>
+            <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-neutral-400 mt-1">
+              <span>Member ID: <span className="font-mono text-white font-bold">{user.memberId}</span></span>
+              <span>·</span>
+              <span>{user.membershipPlan}</span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-neutral-900 border border-neutral-800 text-[10px] font-mono text-neutral-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Cloud Firestore Live</span>
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -215,6 +225,19 @@ export const DashboardPage: React.FC<{ onOpenTimer: () => void }> = ({ onOpenTim
 
         {/* Specific Fitness Goals with Attainment Progress Bars */}
         <FitnessGoalsSection token={token} />
+
+        {/* Weekly Summary Email Generator & Digest Center */}
+        <WeeklySummaryEmailModal
+          token={token}
+          userEmail={user.email}
+          userName={user.name}
+        />
+
+        {/* Weekly Workout Volume & Duration Bar Chart (Recharts) */}
+        <WeeklyVolumeChart token={token} />
+
+        {/* Visual Interactive Workout Calendar */}
+        <WorkoutCalendar token={token} />
 
         {/* Visual Biometric Progress Tracker (Recharts) */}
         <ProgressTracker token={token} targetWeight={80} />

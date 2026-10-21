@@ -1,0 +1,427 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Alex Walker",
+      "email": "demo@fitflex.com",
+      "passwordHash": "fitflex123",
+      "role": "member",
+      "memberId": "FF-884920",
+      "membershipPlan": "Black Card Elite 24/7",
+      "membershipExpiry": "DEC 2027",
+      "phone": "+1 (555) 234-5678",
+      "fitnessGoal": "Hypertrophy & Strength",
+      "targetCalories": 2750
+    },
+    {
+      "id": "u2",
+      "name": "Marcus Vance",
+      "email": "marcus@fitflex.com",
+      "passwordHash": "coach123",
+      "role": "trainer",
+      "memberId": "FF-COACH-01",
+      "membershipPlan": "Master Coach All-Access",
+      "membershipExpiry": "LIFETIME",
+      "phone": "+1 (555) 998-1122"
+    }
+  ],
+  "reservations": [
+    {
+      "id": "res-1",
+      "userEmail": "demo@fitflex.com",
+      "classId": "c1",
+      "classTitle": "Dawn Strength & Barbell",
+      "day": "Monday",
+      "time": "07:00 AM",
+      "trainer": "Marcus Vance",
+      "reservedAt": "2026-10-21T15:08:22.581Z"
+    },
+    {
+      "id": "res-2",
+      "userEmail": "demo@fitflex.com",
+      "classId": "c7",
+      "classTitle": "High-Lactate Metcon",
+      "day": "Wednesday",
+      "time": "06:00 PM",
+      "trainer": "Zack Taylor",
+      "reservedAt": "2026-10-21T15:08:22.581Z"
+    }
+  ],
+  "consultations": [
+    {
+      "id": "con-1",
+      "userEmail": "demo@fitflex.com",
+      "name": "Alex Walker",
+      "phone": "+1 (555) 234-5678",
+      "trainerName": "Marcus Vance",
+      "programInterest": "Strength Training",
+      "date": "2026-10-25",
+      "timeSlot": "10:00 AM",
+      "notes": "Looking to break through squat plateau.",
+      "referenceCode": "FF-948201",
+      "createdAt": "2026-10-21T15:08:22.581Z"
+    }
+  ],
+  "contactMessages": [],
+  "progressLogs": [
+    {
+      "id": "prog-1",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-08-15",
+      "weight": 86.4,
+      "bodyFat": 21.8,
+      "chest": 104,
+      "waist": 92.5,
+      "arms": 37,
+      "thighs": 60.5,
+      "notes": "Initial FitFlex baseline weigh-in with Coach Marcus.",
+      "createdAt": "2026-08-15T00:00:00.000Z"
+    },
+    {
+      "id": "prog-2",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-08-29",
+      "weight": 85.1,
+      "bodyFat": 20.6,
+      "chest": 104.5,
+      "waist": 90,
+      "arms": 37.2,
+      "thighs": 60,
+      "notes": "Week 2 check-in. Sore after Romanian deadlifts but recovery is on point.",
+      "createdAt": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "prog-3",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-09-12",
+      "weight": 84,
+      "bodyFat": 19.4,
+      "chest": 105,
+      "waist": 88,
+      "arms": 37.5,
+      "thighs": 59.5,
+      "notes": "Increased daily water to 3.5L. Energy levels feeling sharp.",
+      "createdAt": "2026-09-12T00:00:00.000Z"
+    },
+    {
+      "id": "prog-4",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-09-26",
+      "weight": 83.2,
+      "bodyFat": 18.2,
+      "chest": 105.5,
+      "waist": 86.5,
+      "arms": 38,
+      "thighs": 59,
+      "notes": "Broke 100kg bench press milestone! Waist dropped 6cm since start.",
+      "createdAt": "2026-09-26T00:00:00.000Z"
+    },
+    {
+      "id": "prog-5",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-10",
+      "weight": 82,
+      "bodyFat": 17,
+      "chest": 106,
+      "waist": 85,
+      "arms": 38.4,
+      "thighs": 59,
+      "notes": "Added Friday night HIIT sprint session. Conditioning elevated.",
+      "createdAt": "2026-10-10T00:00:00.000Z"
+    },
+    {
+      "id": "prog-6",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-20",
+      "weight": 81.2,
+      "bodyFat": 16.1,
+      "chest": 106.5,
+      "waist": 83.5,
+      "arms": 38.8,
+      "thighs": 58.5,
+      "notes": "Current weigh-in. Down 5.2kg with visible abdominal definition.",
+      "createdAt": "2026-10-20T00:00:00.000Z"
+    }
+  ],
+  "fitnessGoals": [
+    {
+      "id": "goal-1",
+      "userEmail": "demo@fitflex.com",
+      "title": "Target Body Recomposition & Fat Shred",
+      "category": "weight_loss",
+      "startValue": 86.4,
+      "currentValue": 81.2,
+      "targetValue": 78,
+      "unit": "kg",
+      "deadline": "2026-12-15",
+      "notes": "Aiming for sub-15% body fat with visible abs.",
+      "createdAt": "2026-08-15T00:00:00.000Z"
+    },
+    {
+      "id": "goal-2",
+      "userEmail": "demo@fitflex.com",
+      "title": "Lean Muscle Mass Hypertrophy",
+      "category": "muscle_gain",
+      "startValue": 64,
+      "currentValue": 67.2,
+      "targetValue": 70,
+      "unit": "kg",
+      "deadline": "2027-02-01",
+      "notes": "Progressive overload on barbell squats and deadlifts.",
+      "createdAt": "2026-08-15T00:00:00.000Z"
+    },
+    {
+      "id": "goal-3",
+      "userEmail": "demo@fitflex.com",
+      "title": "Weekly Gym Training Consistency",
+      "category": "workout_frequency",
+      "startValue": 2,
+      "currentValue": 4,
+      "targetValue": 5,
+      "unit": "days/week",
+      "deadline": "2026-11-30",
+      "notes": "4 lifting sessions + 1 high-tempo HIIT class weekly.",
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "goal-4",
+      "userEmail": "demo@fitflex.com",
+      "title": "Daily High-Protein Target",
+      "category": "nutrition",
+      "startValue": 120,
+      "currentValue": 165,
+      "targetValue": 180,
+      "unit": "g/day",
+      "deadline": "2026-12-31",
+      "notes": "Hitting 2.2g protein per kg of bodyweight.",
+      "createdAt": "2026-09-10T00:00:00.000Z"
+    }
+  ],
+  "workoutSessions": [
+    {
+      "id": "wo-today",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-21",
+      "title": "Heavy Barbell Squats & Quad Hypertrophy",
+      "discipline": "strength",
+      "durationMinutes": 65,
+      "exercisesCompleted": [
+        "Back Squats 4x6 @ 130kg",
+        "Bulgarian Split Squats 3x10",
+        "Leg Press 4x12",
+        "Standing Calf Raises 4x15"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 480,
+      "notes": "Hit clean depth on all squat sets. Quads were on fire by end of drop set.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-2d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-19",
+      "title": "Upper Body Push & Shoulder Demolition",
+      "discipline": "strength",
+      "durationMinutes": 60,
+      "exercisesCompleted": [
+        "Incline Barbell Bench 4x8 @ 85kg",
+        "Dumbbell Overhead Press 3x10",
+        "Dips (Weighted +15kg) 3x8",
+        "Cable Lateral Raises 4x15"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 420,
+      "notes": "Solid lockouts on incline press. Shoulders felt fully pumped.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-4d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-17",
+      "title": "HIIT Sprints & Assault Bike Tabata",
+      "discipline": "hiit",
+      "durationMinutes": 35,
+      "exercisesCompleted": [
+        "Curved Treadmill Sprints 8x30s",
+        "Assault Bike 10/20 Intervals",
+        "Kettlebell Swings 4x20 @ 24kg"
+      ],
+      "intensityRpe": 9,
+      "caloriesBurned": 390,
+      "notes": "Max heart rate touched 176 bpm during final assault bike round.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-6d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-15",
+      "title": "Deadlift Density & Posterior Chain",
+      "discipline": "strength",
+      "durationMinutes": 70,
+      "exercisesCompleted": [
+        "Conventional Deadlift 5x5 @ 165kg",
+        "Romanian Deadlift 3x10",
+        "Chest-Supported T-Bar Rows 4x10",
+        "Hanging Leg Raises 4x15"
+      ],
+      "intensityRpe": 9,
+      "caloriesBurned": 520,
+      "notes": "Clean double overhand grip up to 140kg, strapped for top 5x5.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-8d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-13",
+      "title": "Yoga Restoration & Deep Hip Opener",
+      "discipline": "yoga",
+      "durationMinutes": 45,
+      "exercisesCompleted": [
+        "Sun Salutations A&B",
+        "Pigeon Pose Holds 3m/side",
+        "Lizard Pose & Hip Flossing",
+        "Thoracic Foam Rolling"
+      ],
+      "intensityRpe": 4,
+      "caloriesBurned": 160,
+      "notes": "Great release for tight hip flexors and lower back after heavy deadlifts.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-11d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-10",
+      "title": "Pull Power & Biceps Hypertrophy",
+      "discipline": "strength",
+      "durationMinutes": 55,
+      "exercisesCompleted": [
+        "Weighted Pull-ups 4x6 (+10kg)",
+        "Barbell Pendlay Rows 4x8",
+        "Incline Dumbbell Curls 4x12",
+        "Face Pulls 4x20"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 395,
+      "notes": "Strict form with paused squeeze at the top of pull-ups.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-14d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-07",
+      "title": "Functional Turf Conditioning & Sled Pushes",
+      "discipline": "cardio",
+      "durationMinutes": 50,
+      "exercisesCompleted": [
+        "Heavy Prowler Push 6x40m",
+        "Farmer Walks 4x50m @ 32kg each",
+        "Ski-Erg Intervals 5x500m"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 460,
+      "notes": "Legs were heavy on the last two prowler pushes but sustained target pace.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-17d",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-04",
+      "title": "Active Mobility & Contrast Therapy",
+      "discipline": "recovery",
+      "durationMinutes": 35,
+      "exercisesCompleted": [
+        "90/90 Hip Switches",
+        "Shoulder CARs",
+        "Sauna 15 min & Cold Plunge 3 min"
+      ],
+      "intensityRpe": 3,
+      "caloriesBurned": 110,
+      "notes": "Heart rate reset nicely. CNS felt refreshed.",
+      "createdAt": "2026-10-21T15:08:22.582Z"
+    },
+    {
+      "id": "wo-oct20",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-20",
+      "title": "Heavy Lower Body & Glutes",
+      "discipline": "strength",
+      "durationMinutes": 65,
+      "exercisesCompleted": [
+        "Back Squats 4x6 @ 135kg",
+        "Bulgarian Split Squats 3x10",
+        "Leg Press 4x12"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 480,
+      "notes": "Matched milestone weigh-in day. Energy level peak.",
+      "createdAt": "2026-10-20T10:00:00Z"
+    },
+    {
+      "id": "wo-oct18",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-18",
+      "title": "Upper Push Hypertrophy",
+      "discipline": "strength",
+      "durationMinutes": 60,
+      "exercisesCompleted": [
+        "Incline Bench 4x8",
+        "Dumbbell Shoulder Press 3x10",
+        "Dips 3x12"
+      ],
+      "intensityRpe": 8,
+      "caloriesBurned": 410,
+      "notes": "Pushed heavy sets on incline.",
+      "createdAt": "2026-10-18T10:00:00Z"
+    },
+    {
+      "id": "wo-oct15",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-15",
+      "title": "Metabolic Sprint Circuit",
+      "discipline": "hiit",
+      "durationMinutes": 40,
+      "exercisesCompleted": [
+        "Curved Treadmill 10x30s",
+        "Assault Bike 8 rounds"
+      ],
+      "intensityRpe": 9,
+      "caloriesBurned": 420,
+      "notes": "Fast paced conditioning.",
+      "createdAt": "2026-10-15T10:00:00Z"
+    },
+    {
+      "id": "wo-oct12",
+      "userEmail": "demo@fitflex.com",
+      "date": "2026-10-12",
+      "title": "Deadlifts & Barbell Rows",
+      "discipline": "strength",
+      "durationMinutes": 65,
+      "exercisesCompleted": [
+        "Conventional Deadlift 5x5 @ 160kg",
+        "Pendlay Rows 4x8"
+      ],
+      "intensityRpe": 9,
+      "caloriesBurned": 500,
+      "notes": "Locked out smoothly with zero lower back strain.",
+      "createdAt": "2026-10-12T10:00:00Z"
+    }
+  ],
+  "emailNotifications": [
+    {
+      "id": "notif-1792595693643",
+      "userEmail": "demo@fitflex.com",
+      "recipientEmail": "demo@fitflex.com",
+      "recipientName": "Alex Walker",
+      "subject": "⚡ Your Weekly FitFlex Digest: 7 Workouts Completed • 100% Consistency Rate",
+      "sentAt": "2026-10-21T15:14:53.643Z",
+      "stats": {
+        "totalWorkouts": 7,
+        "totalMinutes": 395,
+        "totalCalories": 3120,
+        "consistencyPct": 100
+      },
+      "goalsCount": 4,
+      "status": "delivered"
+    }
+  ]
+}

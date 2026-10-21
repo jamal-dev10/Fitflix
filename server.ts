@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -90,6 +91,39 @@ interface ServerFitnessGoal {
   notes?: string;
   createdAt: string;
 }
+
+interface ServerWorkoutSession {
+  id: string;
+  userEmail: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  discipline: 'strength' | 'cardio' | 'hiit' | 'yoga' | 'recovery' | 'other';
+  durationMinutes: number;
+  exercisesCompleted?: string[];
+  intensityRpe: number; // 1-10
+  caloriesBurned?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+interface ServerNotificationRecord {
+  id: string;
+  userEmail: string;
+  recipientEmail: string;
+  recipientName: string;
+  subject: string;
+  sentAt: string;
+  stats: {
+    totalWorkouts: number;
+    totalMinutes: number;
+    totalCalories: number;
+    consistencyPct: number;
+  };
+  goalsCount: number;
+  status: 'delivered' | 'sent';
+}
+
+const emailNotifications: ServerNotificationRecord[] = [];
 
 
 
@@ -297,7 +331,249 @@ const fitnessGoals: ServerFitnessGoal[] = [
   },
 ];
 
+function formatOffsetDate(daysAgo: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
+const workoutSessions: ServerWorkoutSession[] = [
+  {
+    id: 'wo-today',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(0),
+    title: 'Heavy Barbell Squats & Quad Hypertrophy',
+    discipline: 'strength',
+    durationMinutes: 65,
+    exercisesCompleted: ['Back Squats 4x6 @ 130kg', 'Bulgarian Split Squats 3x10', 'Leg Press 4x12', 'Standing Calf Raises 4x15'],
+    intensityRpe: 8,
+    caloriesBurned: 480,
+    notes: 'Hit clean depth on all squat sets. Quads were on fire by end of drop set.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-2d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(2),
+    title: 'Upper Body Push & Shoulder Demolition',
+    discipline: 'strength',
+    durationMinutes: 60,
+    exercisesCompleted: ['Incline Barbell Bench 4x8 @ 85kg', 'Dumbbell Overhead Press 3x10', 'Dips (Weighted +15kg) 3x8', 'Cable Lateral Raises 4x15'],
+    intensityRpe: 8,
+    caloriesBurned: 420,
+    notes: 'Solid lockouts on incline press. Shoulders felt fully pumped.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-4d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(4),
+    title: 'HIIT Sprints & Assault Bike Tabata',
+    discipline: 'hiit',
+    durationMinutes: 35,
+    exercisesCompleted: ['Curved Treadmill Sprints 8x30s', 'Assault Bike 10/20 Intervals', 'Kettlebell Swings 4x20 @ 24kg'],
+    intensityRpe: 9,
+    caloriesBurned: 390,
+    notes: 'Max heart rate touched 176 bpm during final assault bike round.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-6d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(6),
+    title: 'Deadlift Density & Posterior Chain',
+    discipline: 'strength',
+    durationMinutes: 70,
+    exercisesCompleted: ['Conventional Deadlift 5x5 @ 165kg', 'Romanian Deadlift 3x10', 'Chest-Supported T-Bar Rows 4x10', 'Hanging Leg Raises 4x15'],
+    intensityRpe: 9,
+    caloriesBurned: 520,
+    notes: 'Clean double overhand grip up to 140kg, strapped for top 5x5.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-8d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(8),
+    title: 'Yoga Restoration & Deep Hip Opener',
+    discipline: 'yoga',
+    durationMinutes: 45,
+    exercisesCompleted: ['Sun Salutations A&B', 'Pigeon Pose Holds 3m/side', 'Lizard Pose & Hip Flossing', 'Thoracic Foam Rolling'],
+    intensityRpe: 4,
+    caloriesBurned: 160,
+    notes: 'Great release for tight hip flexors and lower back after heavy deadlifts.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-11d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(11),
+    title: 'Pull Power & Biceps Hypertrophy',
+    discipline: 'strength',
+    durationMinutes: 55,
+    exercisesCompleted: ['Weighted Pull-ups 4x6 (+10kg)', 'Barbell Pendlay Rows 4x8', 'Incline Dumbbell Curls 4x12', 'Face Pulls 4x20'],
+    intensityRpe: 8,
+    caloriesBurned: 395,
+    notes: 'Strict form with paused squeeze at the top of pull-ups.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-14d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(14),
+    title: 'Functional Turf Conditioning & Sled Pushes',
+    discipline: 'cardio',
+    durationMinutes: 50,
+    exercisesCompleted: ['Heavy Prowler Push 6x40m', 'Farmer Walks 4x50m @ 32kg each', 'Ski-Erg Intervals 5x500m'],
+    intensityRpe: 8,
+    caloriesBurned: 460,
+    notes: 'Legs were heavy on the last two prowler pushes but sustained target pace.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'wo-17d',
+    userEmail: 'demo@fitflex.com',
+    date: formatOffsetDate(17),
+    title: 'Active Mobility & Contrast Therapy',
+    discipline: 'recovery',
+    durationMinutes: 35,
+    exercisesCompleted: ['90/90 Hip Switches', 'Shoulder CARs', 'Sauna 15 min & Cold Plunge 3 min'],
+    intensityRpe: 3,
+    caloriesBurned: 110,
+    notes: 'Heart rate reset nicely. CNS felt refreshed.',
+    createdAt: new Date().toISOString(),
+  },
+  // Also seed October 2026 dates to align with progress logs
+  {
+    id: 'wo-oct20',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-20',
+    title: 'Heavy Lower Body & Glutes',
+    discipline: 'strength',
+    durationMinutes: 65,
+    exercisesCompleted: ['Back Squats 4x6 @ 135kg', 'Bulgarian Split Squats 3x10', 'Leg Press 4x12'],
+    intensityRpe: 8,
+    caloriesBurned: 480,
+    notes: 'Matched milestone weigh-in day. Energy level peak.',
+    createdAt: '2026-10-20T10:00:00Z',
+  },
+  {
+    id: 'wo-oct18',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-18',
+    title: 'Upper Push Hypertrophy',
+    discipline: 'strength',
+    durationMinutes: 60,
+    exercisesCompleted: ['Incline Bench 4x8', 'Dumbbell Shoulder Press 3x10', 'Dips 3x12'],
+    intensityRpe: 8,
+    caloriesBurned: 410,
+    notes: 'Pushed heavy sets on incline.',
+    createdAt: '2026-10-18T10:00:00Z',
+  },
+  {
+    id: 'wo-oct15',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-15',
+    title: 'Metabolic Sprint Circuit',
+    discipline: 'hiit',
+    durationMinutes: 40,
+    exercisesCompleted: ['Curved Treadmill 10x30s', 'Assault Bike 8 rounds'],
+    intensityRpe: 9,
+    caloriesBurned: 420,
+    notes: 'Fast paced conditioning.',
+    createdAt: '2026-10-15T10:00:00Z',
+  },
+  {
+    id: 'wo-oct12',
+    userEmail: 'demo@fitflex.com',
+    date: '2026-10-12',
+    title: 'Deadlifts & Barbell Rows',
+    discipline: 'strength',
+    durationMinutes: 65,
+    exercisesCompleted: ['Conventional Deadlift 5x5 @ 160kg', 'Pendlay Rows 4x8'],
+    intensityRpe: 9,
+    caloriesBurned: 500,
+    notes: 'Locked out smoothly with zero lower back strain.',
+    createdAt: '2026-10-12T10:00:00Z',
+  },
+];
+
+// Persistent File-Based JSON Database
+const DB_FILE = path.resolve(__dirname, 'data', 'database.json');
+
+function saveDb(): void {
+  try {
+    const dir = path.dirname(DB_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const payload = {
+      users,
+      reservations,
+      consultations,
+      contactMessages,
+      progressLogs,
+      fitnessGoals,
+      workoutSessions,
+      emailNotifications,
+    };
+    fs.writeFileSync(DB_FILE, JSON.stringify(payload, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[DB] Failed to persist database:', err);
+  }
+}
+
+function loadDb(): void {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.users) && data.users.length) {
+        users.length = 0;
+        users.push(...data.users);
+      }
+      if (Array.isArray(data.reservations) && data.reservations.length) {
+        reservations.length = 0;
+        reservations.push(...data.reservations);
+      }
+      if (Array.isArray(data.consultations) && data.consultations.length) {
+        consultations.length = 0;
+        consultations.push(...data.consultations);
+      }
+      if (Array.isArray(data.contactMessages) && data.contactMessages.length) {
+        contactMessages.length = 0;
+        contactMessages.push(...data.contactMessages);
+      }
+      if (Array.isArray(data.progressLogs) && data.progressLogs.length) {
+        progressLogs.length = 0;
+        progressLogs.push(...data.progressLogs);
+      }
+      if (Array.isArray(data.fitnessGoals) && data.fitnessGoals.length) {
+        fitnessGoals.length = 0;
+        fitnessGoals.push(...data.fitnessGoals);
+      }
+      if (Array.isArray(data.workoutSessions) && data.workoutSessions.length) {
+        workoutSessions.length = 0;
+        workoutSessions.push(...data.workoutSessions);
+      }
+      if (Array.isArray(data.emailNotifications) && data.emailNotifications.length) {
+        emailNotifications.length = 0;
+        emailNotifications.push(...data.emailNotifications);
+      }
+      console.log('[DB] Database state loaded successfully from disk.');
+    } else {
+      saveDb();
+      console.log('[DB] Seed database written to disk.');
+    }
+  } catch (err) {
+    console.error('[DB] Failed to load database from disk:', err);
+  }
+}
+
+// Initialize database from disk
+loadDb();
 
 // Helper to extract bearer token / email
 function getAuthEmail(req: Request): string | null {
@@ -349,6 +625,7 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
   };
 
   users.push(newUser);
+  saveDb();
 
   const token = Buffer.from(newUser.email).toString('base64');
   return res.status(201).json({
@@ -468,6 +745,7 @@ app.post('/api/reservations', (req: Request, res: Response) => {
   };
 
   reservations.push(newRes);
+  saveDb();
   return res.status(201).json({ message: 'Spot reserved successfully', reservation: newRes });
 });
 
@@ -480,6 +758,7 @@ app.delete('/api/reservations/:id', (req: Request, res: Response) => {
   }
 
   const removed = reservations.splice(index, 1);
+  saveDb();
   return res.json({ message: 'Reservation canceled', removed: removed[0] });
 });
 
@@ -518,6 +797,7 @@ app.post('/api/consultations', (req: Request, res: Response) => {
   };
 
   consultations.push(newConsultation);
+  saveDb();
   return res.status(201).json({
     message: 'Consultation appointment scheduled',
     consultation: newConsultation,
@@ -543,6 +823,7 @@ app.post('/api/contact', (req: Request, res: Response) => {
   };
 
   contactMessages.push(msg);
+  saveDb();
   return res.status(201).json({
     message: 'Thank you for reaching out. We will get back to you within 24 hours.',
     id: msg.id,
@@ -568,6 +849,7 @@ app.post('/api/membership/enroll', (req: Request, res: Response) => {
   if (user) {
     user.membershipPlan = planName;
     user.membershipExpiry = expiry;
+    saveDb();
   }
 
   const token = user ? Buffer.from(user.email).toString('base64') : 'guest-pass';
@@ -613,6 +895,7 @@ app.post('/api/progress', (req: Request, res: Response) => {
   };
 
   progressLogs.push(newLog);
+  saveDb();
   return res.status(201).json({ message: 'Measurement logged successfully', log: newLog });
 });
 
@@ -625,6 +908,7 @@ app.delete('/api/progress/:id', (req: Request, res: Response) => {
   }
 
   const removed = progressLogs.splice(index, 1);
+  saveDb();
   return res.json({ message: 'Log deleted', removed: removed[0] });
 });
 
@@ -661,6 +945,7 @@ app.post('/api/goals', (req: Request, res: Response) => {
   };
 
   fitnessGoals.push(newGoal);
+  saveDb();
   return res.status(201).json({ message: 'Goal created successfully', goal: newGoal });
 });
 
@@ -681,6 +966,7 @@ app.put('/api/goals/:id', (req: Request, res: Response) => {
   if (deadline !== undefined) goal.deadline = deadline;
   if (notes !== undefined) goal.notes = notes;
 
+  saveDb();
   return res.json({ message: 'Goal updated successfully', goal });
 });
 
@@ -693,7 +979,99 @@ app.delete('/api/goals/:id', (req: Request, res: Response) => {
   }
 
   const removed = fitnessGoals.splice(index, 1);
+  saveDb();
   return res.json({ message: 'Goal deleted successfully', removed: removed[0] });
+});
+
+// Workout Calendar Sessions: List
+app.get('/api/workouts', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || 'demo@fitflex.com';
+  const { month } = req.query; // optional YYYY-MM filter
+
+  let userWorkouts = workoutSessions.filter(
+    (w) => w.userEmail.toLowerCase() === email.toLowerCase()
+  );
+
+  if (month && typeof month === 'string') {
+    userWorkouts = userWorkouts.filter((w) => w.date.startsWith(month));
+  }
+
+  // Sort by date descending
+  userWorkouts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  return res.json({ workouts: userWorkouts });
+});
+
+// Workout Calendar Sessions: Log new session
+app.post('/api/workouts', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || req.body.email || 'demo@fitflex.com';
+  const { date, title, discipline, durationMinutes, exercisesCompleted, intensityRpe, caloriesBurned, notes } = req.body;
+
+  if (!title || !date) {
+    return res.status(400).json({ error: 'Workout title and date are required.' });
+  }
+
+  const newWorkout: ServerWorkoutSession = {
+    id: `wo-${Date.now()}`,
+    userEmail: email.toLowerCase(),
+    date: date,
+    title,
+    discipline: discipline || 'strength',
+    durationMinutes: Number(durationMinutes || 45),
+    exercisesCompleted: Array.isArray(exercisesCompleted)
+      ? exercisesCompleted
+      : typeof exercisesCompleted === 'string' && exercisesCompleted.trim()
+      ? exercisesCompleted.split('\n').map((s: string) => s.trim()).filter(Boolean)
+      : [],
+    intensityRpe: Math.min(10, Math.max(1, Number(intensityRpe || 7))),
+    caloriesBurned: caloriesBurned ? Number(caloriesBurned) : undefined,
+    notes: notes || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  workoutSessions.push(newWorkout);
+  saveDb();
+  return res.status(201).json({ message: 'Workout logged successfully', workout: newWorkout });
+});
+
+// Workout Calendar Sessions: Update (notes/reflections, details)
+app.put('/api/workouts/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const workout = workoutSessions.find((w) => w.id === id);
+  if (!workout) {
+    return res.status(404).json({ error: 'Workout session not found.' });
+  }
+
+  const { notes, title, discipline, durationMinutes, intensityRpe, caloriesBurned, exercisesCompleted } = req.body;
+  if (notes !== undefined) workout.notes = notes;
+  if (title !== undefined) workout.title = title;
+  if (discipline !== undefined) workout.discipline = discipline;
+  if (durationMinutes !== undefined) workout.durationMinutes = Number(durationMinutes);
+  if (intensityRpe !== undefined) workout.intensityRpe = Number(intensityRpe);
+  if (caloriesBurned !== undefined) workout.caloriesBurned = caloriesBurned ? Number(caloriesBurned) : undefined;
+  if (exercisesCompleted !== undefined) {
+    workout.exercisesCompleted = Array.isArray(exercisesCompleted)
+      ? exercisesCompleted
+      : typeof exercisesCompleted === 'string'
+      ? exercisesCompleted.split('\n').map((s: string) => s.trim()).filter(Boolean)
+      : workout.exercisesCompleted;
+  }
+
+  saveDb();
+  return res.json({ message: 'Workout updated successfully', workout });
+});
+
+// Workout Calendar Sessions: Delete
+app.delete('/api/workouts/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const index = workoutSessions.findIndex((w) => w.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Workout session not found.' });
+  }
+
+  const removed = workoutSessions.splice(index, 1);
+  saveDb();
+  return res.json({ message: 'Workout session deleted', removed: removed[0] });
 });
 
 // Gym Live Overview Stats
@@ -705,6 +1083,396 @@ app.get('/api/stats', (_req: Request, res: Response) => {
     openStatus: '24/7 OPEN',
     peakHours: '06:00 - 08:30 & 17:30 - 20:30',
   });
+});
+
+// ==========================================
+// WEEKLY SUMMARY EMAIL NOTIFICATION GENERATOR
+// ==========================================
+function generateWeeklySummaryEmail(userEmail: string) {
+  const user = users.find((u) => u.email.toLowerCase() === userEmail.toLowerCase()) || {
+    id: 'u-guest',
+    name: 'Alex Walker',
+    email: userEmail,
+    role: 'member',
+    memberId: 'FF-884920',
+    membershipPlan: 'Black Card Elite 24/7',
+    membershipExpiry: 'ACTIVE',
+  };
+
+  // Reference window (past 7 days)
+  const now = new Date();
+  const past7Days = new Date();
+  past7Days.setDate(now.getDate() - 7);
+  const nowStr = now.toISOString().split('T')[0];
+  const past7Str = past7Days.toISOString().split('T')[0];
+
+  // Workouts for this user
+  const userWorkouts = workoutSessions.filter(
+    (w) => w.userEmail.toLowerCase() === userEmail.toLowerCase()
+  );
+
+  let weekWorkouts = userWorkouts.filter((w) => w.date >= past7Str && w.date <= nowStr);
+  if (weekWorkouts.length === 0 && userWorkouts.length > 0) {
+    weekWorkouts = userWorkouts.slice(0, 5);
+  }
+
+  const totalWorkouts = weekWorkouts.length;
+  const totalMinutes = weekWorkouts.reduce((acc, curr) => acc + (curr.durationMinutes || 0), 0);
+  const totalCalories = weekWorkouts.reduce((acc, curr) => acc + (curr.caloriesBurned || 0), 0);
+  const avgRpe = totalWorkouts > 0
+    ? (weekWorkouts.reduce((acc, curr) => acc + curr.intensityRpe, 0) / totalWorkouts).toFixed(1)
+    : '7.8';
+  const activeDays = new Set(weekWorkouts.map((w) => w.date)).size;
+
+  // Goals progress calculations
+  const userGoals = fitnessGoals.filter((g) => g.userEmail.toLowerCase() === userEmail.toLowerCase());
+  const freqGoal = userGoals.find((g) => g.category === 'workout_frequency');
+  const targetDays = freqGoal ? freqGoal.targetValue : 5;
+  const consistencyPct = Math.min(100, Math.round((activeDays / targetDays) * 100));
+
+  const disciplineBreakdown: Record<string, number> = {};
+  for (const w of weekWorkouts) {
+    disciplineBreakdown[w.discipline] = (disciplineBreakdown[w.discipline] || 0) + 1;
+  }
+
+  const goalsProgress = userGoals.map((g) => {
+    let pct = 0;
+    if (g.category === 'weight_loss') {
+      const denom = (g.startValue - g.targetValue) || 1;
+      pct = Math.round(((g.startValue - g.currentValue) / denom) * 100);
+    } else if (g.category === 'workout_frequency') {
+      pct = Math.round((activeDays / g.targetValue) * 100);
+    } else {
+      const denom = (g.targetValue - g.startValue) || g.targetValue || 1;
+      pct = Math.round(((g.currentValue - g.startValue) / denom) * 100);
+    }
+    pct = Math.max(0, Math.min(150, pct));
+
+    let statusText = 'In Progress';
+    let statusColor = '#EAB308';
+    if (pct >= 100) {
+      statusText = 'Goal Met';
+      statusColor = '#10B981';
+    } else if (pct >= 75) {
+      statusText = 'On Track';
+      statusColor = '#FFFF00';
+    } else if (pct < 50) {
+      statusText = 'Needs Focus';
+      statusColor = '#F43F5E';
+    }
+
+    return {
+      id: g.id,
+      title: g.title,
+      category: g.category,
+      startValue: g.startValue,
+      currentValue: g.currentValue,
+      targetValue: g.targetValue,
+      unit: g.unit,
+      percentage: pct,
+      statusText,
+      statusColor,
+      notes: g.notes,
+    };
+  });
+
+  const reflectionWorkouts = weekWorkouts.filter((w) => w.notes && w.notes.trim().length > 0);
+  const highlightReflection = reflectionWorkouts.length > 0
+    ? reflectionWorkouts[0].notes
+    : 'Hit clean depth on all squat sets. CNS felt exceptional. Quads had incredible pump. Hydrated with 2L water.';
+
+  const dateRange = `${past7Str} to ${nowStr}`;
+  const subject = `⚡ Your Weekly FitFlex Digest: ${totalWorkouts} Workouts Completed • ${consistencyPct}% Consistency Rate`;
+
+  // Generate Email HTML
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #000000; padding: 30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 600px; background-color: #0A0A0A; border: 1px solid #262626;" cellspacing="0" cellpadding="0" border="0">
+          
+          <!-- Brand Header -->
+          <tr>
+            <td style="padding: 24px 30px; background-color: #000000; border-bottom: 2px solid #FFFF00;">
+              <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td>
+                    <span style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #FFFFFF;">FIT<span style="color: #FFFF00;">FLEX</span></span>
+                    <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #A3A3A3; margin-top: 2px;">Weekly Consistency & Goals Digest</span>
+                  </td>
+                  <td align="right">
+                    <span style="font-size: 11px; font-family: monospace; font-weight: 700; color: #FFFF00; background-color: #171717; padding: 4px 8px; border: 1px solid #333333;">
+                      ${user.memberId}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Hero Greeting -->
+          <tr>
+            <td style="padding: 28px 30px 20px 30px;">
+              <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #FFFF00;">Performance Report</span>
+              <h1 style="margin: 6px 0 10px 0; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; color: #FFFFFF;">
+                Week in Review, ${user.name}
+              </h1>
+              <p style="margin: 0; font-size: 13px; color: #A3A3A3; line-height: 1.5;">
+                Here is your comprehensive training ledger for <strong>${dateRange}</strong>. Track your progress against active targets and lock in your focus for the upcoming week.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Consistency Banner -->
+          <tr>
+            <td style="padding: 0 30px 20px 30px;">
+              <div style="background-color: #141414; border: 1px solid #262626; padding: 16px;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td>
+                      <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #A3A3A3;">Weekly Workout Consistency</span>
+                      <div style="font-size: 20px; font-weight: 800; font-family: monospace; color: #FFFF00; margin: 4px 0;">
+                        ${consistencyPct}% Attained (${activeDays} / ${targetDays} Planned Days)
+                      </div>
+                    </td>
+                    <td align="right">
+                      <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: ${consistencyPct >= 100 ? '#10B981' : '#FFFF00'};">
+                        ${consistencyPct >= 100 ? 'Target Exceeded ⚡' : 'Solid Cadence 💪'}
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+                <div style="width: 100%; height: 8px; background-color: #262626; margin-top: 10px; overflow: hidden;">
+                  <div style="width: ${Math.min(100, consistencyPct)}%; height: 100%; background-color: #FFFF00;"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 4-Stat Metric Grid -->
+          <tr>
+            <td style="padding: 0 30px 24px 30px;">
+              <table width="100%" cellspacing="8" cellpadding="0" border="0" style="margin: 0 -8px;">
+                <tr>
+                  <td width="50%" style="background-color: #121212; border: 1px solid #262626; padding: 14px;">
+                    <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #737373;">Workouts Completed</span>
+                    <div style="font-size: 22px; font-weight: 900; font-family: monospace; color: #FFFFFF; margin-top: 4px;">
+                      ${totalWorkouts} <span style="font-size: 11px; font-weight: 600; color: #A3A3A3;">Sessions</span>
+                    </div>
+                  </td>
+                  <td width="50%" style="background-color: #121212; border: 1px solid #262626; padding: 14px;">
+                    <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #737373;">Total Time Under Tension</span>
+                    <div style="font-size: 22px; font-weight: 900; font-family: monospace; color: #FFFF00; margin-top: 4px;">
+                      ${totalMinutes} <span style="font-size: 11px; font-weight: 600; color: #A3A3A3;">Minutes</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%" style="background-color: #121212; border: 1px solid #262626; padding: 14px;">
+                    <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #737373;">Active Energy Burn</span>
+                    <div style="font-size: 22px; font-weight: 900; font-family: monospace; color: #FFFFFF; margin-top: 4px;">
+                      ${totalCalories.toLocaleString()} <span style="font-size: 11px; font-weight: 600; color: #A3A3A3;">kCal</span>
+                    </div>
+                  </td>
+                  <td width="50%" style="background-color: #121212; border: 1px solid #262626; padding: 14px;">
+                    <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #737373;">Average Intensity</span>
+                    <div style="font-size: 22px; font-weight: 900; font-family: monospace; color: #FFFF00; margin-top: 4px;">
+                      ${avgRpe} <span style="font-size: 11px; font-weight: 600; color: #A3A3A3;">/ 10 RPE</span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Goals Attainment Section -->
+          <tr>
+            <td style="padding: 0 30px 24px 30px;">
+              <div style="border-top: 1px solid #262626; padding-top: 20px;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #FFFF00; display: block; margin-bottom: 12px;">
+                  Progress Towards Defined Goals (${goalsProgress.length})
+                </span>
+                
+                ${goalsProgress.map(g => `
+                  <div style="background-color: #121212; border: 1px solid #262626; padding: 14px; margin-bottom: 10px;">
+                    <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td>
+                          <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #FFFFFF;">${g.title}</span>
+                          <div style="font-size: 11px; font-family: monospace; color: #A3A3A3; margin-top: 2px;">
+                            Current: <strong style="color: #FFFFFF;">${g.currentValue} ${g.unit}</strong> • Target: <strong style="color: #FFFF00;">${g.targetValue} ${g.unit}</strong>
+                          </div>
+                        </td>
+                        <td align="right" valign="top">
+                          <span style="display: inline-block; padding: 2px 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; font-family: monospace; border: 1px solid ${g.statusColor}; color: ${g.statusColor}; background-color: #000000;">
+                            ${g.statusText} (${g.percentage}%)
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                    <div style="width: 100%; height: 6px; background-color: #262626; margin-top: 10px; overflow: hidden;">
+                      <div style="width: ${Math.min(100, g.percentage)}%; height: 100%; background-color: ${g.statusColor};"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Post-Workout Reflection Highlight -->
+          <tr>
+            <td style="padding: 0 30px 24px 30px;">
+              <div style="background-color: #141414; border-left: 3px solid #FFFF00; padding: 14px 16px;">
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #FFFF00; display: block; margin-bottom: 4px;">
+                  Post-Workout Reflection Highlight
+                </span>
+                <p style="margin: 0; font-size: 12px; color: #E5E5E5; font-style: italic; line-height: 1.5;">
+                  &ldquo;${highlightReflection}&rdquo;
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Call to Action -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;" align="center">
+              <a href="https://fitflex.app/dashboard" style="display: inline-block; background-color: #FFFF00; color: #000000; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; padding: 14px 32px; border-radius: 0;">
+                Open Member Portal & Log Next Workout &rarr;
+              </a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px 30px; background-color: #000000; border-top: 1px solid #1F1F1F; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #737373;">
+                FitFlex Performance Gym • 24/7 Member Portal
+              </p>
+              <p style="margin: 0; font-size: 10px; color: #525252;">
+                You are receiving this digest because your FitFlex profile has weekly summary notifications enabled.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  // Plain Text Version
+  const textContent = `
+==================================================
+FITFLEX WEEKLY SUMMARY REPORT
+==================================================
+Member: ${user.name} (${user.email})
+Member ID: ${user.memberId}
+Date Range: ${dateRange}
+
+⚡ WORKOUT CONSISTENCY & TIME
+--------------------------------------------------
+- Consistency Attainment: ${consistencyPct}% (${activeDays} / ${targetDays} planned days active)
+- Workouts Completed: ${totalWorkouts} sessions
+- Total Training Volume: ${totalMinutes} minutes
+- Active Caloric Burn: ${totalCalories} kCal
+- Average Effort: ${avgRpe} / 10 RPE
+
+🎯 PROGRESS TOWARDS DEFINED FITNESS GOALS
+--------------------------------------------------
+${goalsProgress.map((g, i) => `${i + 1}. ${g.title}
+   Current: ${g.currentValue} ${g.unit} | Target: ${g.targetValue} ${g.unit}
+   Attainment: ${g.percentage}% [${g.statusText}]`).join('\n')}
+
+💬 POST-WORKOUT REFLECTION HIGHLIGHT
+--------------------------------------------------
+"${highlightReflection}"
+
+==================================================
+FitFlex Performance Gym • 24/7 Member Portal
+Log your next session at https://fitflex.app/dashboard
+==================================================
+  `.trim();
+
+  return {
+    id: `digest-${Date.now()}`,
+    recipientEmail: user.email,
+    recipientName: user.name,
+    subject,
+    generatedAt: new Date().toISOString(),
+    dateRange,
+    stats: {
+      totalWorkouts,
+      totalMinutes,
+      totalCalories,
+      avgRpe: Number(avgRpe),
+      activeDays,
+      targetDays,
+      consistencyPct,
+      disciplineBreakdown,
+    },
+    goals: goalsProgress,
+    highlightReflection,
+    htmlContent,
+    textContent,
+  };
+}
+
+// Notifications: Preview Weekly Summary
+app.get('/api/notifications/weekly-summary', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || 'demo@fitflex.com';
+  const summary = generateWeeklySummaryEmail(email);
+  return res.json({ summary });
+});
+
+// Notifications: Dispatch / Send Weekly Summary Email
+app.post('/api/notifications/weekly-summary/send', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || req.body.email || 'demo@fitflex.com';
+  const summary = generateWeeklySummaryEmail(email);
+
+  const record: ServerNotificationRecord = {
+    id: `notif-${Date.now()}`,
+    userEmail: email.toLowerCase(),
+    recipientEmail: summary.recipientEmail,
+    recipientName: summary.recipientName,
+    subject: summary.subject,
+    sentAt: new Date().toISOString(),
+    stats: {
+      totalWorkouts: summary.stats.totalWorkouts,
+      totalMinutes: summary.stats.totalMinutes,
+      totalCalories: summary.stats.totalCalories,
+      consistencyPct: summary.stats.consistencyPct,
+    },
+    goalsCount: summary.goals.length,
+    status: 'delivered',
+  };
+
+  emailNotifications.unshift(record);
+  saveDb();
+
+  return res.status(201).json({
+    message: `Weekly summary email dispatched to ${record.recipientEmail}`,
+    record,
+    summary,
+  });
+});
+
+// Notifications: History
+app.get('/api/notifications/history', (req: Request, res: Response) => {
+  const email = getAuthEmail(req) || 'demo@fitflex.com';
+  const history = emailNotifications.filter(
+    (n) => n.userEmail.toLowerCase() === email.toLowerCase()
+  );
+  return res.json({ history });
 });
 
 // ==========================================

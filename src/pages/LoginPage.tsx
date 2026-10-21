@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Mail, User, Phone, Target, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { login, register, user } = useAuth();
+  const { login, loginWithGoogle, register, user } = useAuth();
   const navigate = useNavigate();
 
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -15,6 +15,18 @@ export const LoginPage: React.FC = () => {
   const [goal, setGoal] = useState('Strength & Muscle Hypertrophy');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setIsSubmitting(true);
+    const res = await loginWithGoogle();
+    setIsSubmitting(false);
+    if (res.success) {
+      navigate('/dashboard');
+    } else {
+      setError(res.error || 'Google Sign-In failed.');
+    }
+  };
 
   // If already logged in, redirect to dashboard
   if (user) {
@@ -139,6 +151,42 @@ export const LoginPage: React.FC = () => {
           >
             Register
           </button>
+        </div>
+
+        {/* Google Firebase Auth Option */}
+        <button
+          type="button"
+          disabled={isSubmitting}
+          onClick={handleGoogleLogin}
+          className="w-full py-3 px-4 mb-4 bg-neutral-900 hover:bg-neutral-850 border border-neutral-700 hover:border-[#FFFF00] text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-3 cursor-pointer group shadow-sm"
+        >
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.64v3.03h3.88c2.27-2.09 3.66-5.17 3.66-9.11z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.03c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.13C3.26 21.36 7.34 24 12 24z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.57H1.25C.45 8.16 0 9.98 0 12s.45 3.84 1.25 5.43l4.03-3.14z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.57l4.03 3.14c.95-2.83 3.6-4.96 6.72-4.96z"
+            />
+          </svg>
+          <span>Continue with Google (Firebase)</span>
+        </button>
+
+        <div className="relative flex py-1 items-center mb-4">
+          <div className="flex-grow border-t border-neutral-800"></div>
+          <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-neutral-500 tracking-wider">
+            or use credentials
+          </span>
+          <div className="flex-grow border-t border-neutral-800"></div>
         </div>
 
         {/* Error Alert */}

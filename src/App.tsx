@@ -17,6 +17,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { CoachAvailabilityPage } from './pages/CoachAvailabilityPage';
 
 // Modals & Tools
 import { BookingModal } from './components/BookingModal';
@@ -51,6 +52,8 @@ export const AppContent: React.FC = () => {
           <Route path="/" element={<HomePage onOpenBooking={() => handleOpenBooking()} />} />
           <Route path="/programs" element={<ProgramsPage onOpenBooking={handleOpenBooking} />} />
           <Route path="/training" element={<TrainingPage />} />
+          <Route path="/coaches" element={<CoachAvailabilityPage />} />
+          <Route path="/mark" element={<CoachAvailabilityPage />} />
           <Route path="/nutrition" element={<NutritionPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/pricing" element={<PricingPage />} />
